@@ -5,7 +5,7 @@ import { Search } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { listingsQuery } from "@/lib/queries";
 
-export const Route = createFileRoute("/listings")({
+export const Route = createFileRoute("/listings/")({
   head: () => ({
     meta: [
       { title: "Property Listings — Moxie Homes & Properties" },
