@@ -57,7 +57,7 @@ export function SiteHeader() {
         <div className="hidden lg:flex items-center gap-3">
           {signedIn ? (
             <Link
-              to="/_authenticated/admin"
+              to="/admin"
               className="text-sm font-medium text-navy hover:text-gold transition-colors"
             >
               Dashboard
@@ -104,7 +104,7 @@ export function SiteHeader() {
             <div className="mt-2 flex gap-2">
               {signedIn ? (
                 <Link
-                  to="/_authenticated/admin"
+                  to="/admin"
                   className="flex-1 rounded-md border border-navy px-3 py-2 text-center text-sm font-medium text-navy"
                 >
                   Dashboard
