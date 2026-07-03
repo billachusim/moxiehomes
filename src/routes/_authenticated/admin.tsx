@@ -542,7 +542,7 @@ function InquiriesAdmin() {
                   {i.phone && <div className="text-sm text-muted-foreground">{i.phone}</div>}
                   <div className="text-xs text-muted-foreground mt-1">{new Date(i.created_at).toLocaleString()}</div>
                 </div>
-                <select value={i.status} onChange={(e) => setStatus(i.id, e.target.value)} className="h-9 rounded-md border px-2 text-xs">
+                <select value={i.status} onChange={(e) => setStatus(i.id, e.target.value as any)} className="h-9 rounded-md border px-2 text-xs">
                   <option value="new">New</option>
                   <option value="in_progress">In progress</option>
                   <option value="replied">Replied</option>
@@ -593,7 +593,7 @@ function BookingsAdmin() {
                   <td className="p-3">{b.preferred_date}</td>
                   <td className="p-3 text-muted-foreground">{b.phone}<br/><span className="text-xs">{b.email}</span></td>
                   <td className="p-3">
-                    <select value={b.status} onChange={(e) => setStatus(b.id, e.target.value)} className="h-9 rounded-md border px-2 text-xs">
+                    <select value={b.status} onChange={(e) => setStatus(b.id, e.target.value as any)} className="h-9 rounded-md border px-2 text-xs">
                       <option value="pending">Pending</option>
                       <option value="confirmed">Confirmed</option>
                       <option value="completed">Completed</option>
@@ -652,7 +652,7 @@ function UsersAdmin() {
                   {u.roles.map((r: string) => (
                     <span key={r} className="inline-flex items-center gap-1 rounded-full bg-secondary px-2 py-0.5 text-xs">
                       {r}
-                      <button onClick={() => removeRole(u.id, r)} className="text-destructive">×</button>
+                      <button onClick={() => removeRole(u.id, r as any)} className="text-destructive">×</button>
                     </span>
                   ))}
                 </div>
