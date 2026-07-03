@@ -525,7 +525,7 @@ function InquiriesAdmin() {
     queryFn: async () => (await supabase.from("inquiries").select("*").order("created_at", { ascending: false })).data ?? [],
   });
   const setStatus = async (id: string, status: string) => {
-    await supabase.from("inquiries").update({ status }).eq("id", id);
+    await supabase.from("inquiries").update({ status: status as any }).eq("id", id);
     qc.invalidateQueries({ queryKey: ["admin", "inquiries"] });
   };
   return (
@@ -566,7 +566,7 @@ function BookingsAdmin() {
     queryFn: async () => (await supabase.from("inspection_bookings").select("*, listings(title,slug)").order("preferred_date", { ascending: true })).data ?? [],
   });
   const setStatus = async (id: string, status: string) => {
-    await supabase.from("inspection_bookings").update({ status }).eq("id", id);
+    await supabase.from("inspection_bookings").update({ status: status as any }).eq("id", id);
     qc.invalidateQueries({ queryKey: ["admin", "bookings"] });
   };
   return (
@@ -633,7 +633,7 @@ function UsersAdmin() {
     qc.invalidateQueries({ queryKey: ["admin", "users"] });
   };
   const removeRole = async (userId: string, role: string) => {
-    await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", role);
+    await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", role as any);
     qc.invalidateQueries({ queryKey: ["admin", "users"] });
   };
 
