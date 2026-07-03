@@ -22,9 +22,14 @@ function ListingsPage() {
   const { data } = useSuspenseQuery(listingsQuery());
   const [q, setQ] = useState("");
   const [loc, setLoc] = useState<string>("all");
+  const [type, setType] = useState<string>("all");
 
   const locations = useMemo(
     () => Array.from(new Set(data.map((l) => l.city ?? l.location))).sort(),
+    [data],
+  );
+  const types = useMemo(
+    () => Array.from(new Set(data.map((l) => l.property_type).filter(Boolean) as string[])).sort(),
     [data],
   );
   const filtered = useMemo(() => {
@@ -33,9 +38,13 @@ function ListingsPage() {
         l.title.toLowerCase().includes(q.toLowerCase()) ||
         l.location.toLowerCase().includes(q.toLowerCase());
       const matchesLoc = loc === "all" || (l.city ?? l.location) === loc;
-      return matchesQ && matchesLoc;
+      const matchesType = type === "all" || l.property_type === type;
+      return matchesQ && matchesLoc && matchesType;
     });
-  }, [data, q, loc]);
+  }, [data, q, loc, type]);
+
+  const formatType = (t: string) =>
+    t.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 
   return (
     <SiteLayout>
@@ -67,6 +76,24 @@ function ListingsPage() {
                 <option key={l} value={l}>{l}</option>
               ))}
             </select>
+            <select
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+              className="h-11 rounded-md border border-input bg-background px-3 text-sm outline-none focus:border-gold"
+            >
+              <option value="all">All property types</option>
+              {types.map((t) => (
+                <option key={t} value={t}>{formatType(t)}</option>
+              ))}
+            </select>
+            {(loc !== "all" || type !== "all" || q) && (
+              <button
+                onClick={() => { setQ(""); setLoc("all"); setType("all"); }}
+                className="h-11 rounded-md border border-input bg-background px-4 text-sm text-navy hover:border-gold"
+              >
+                Clear
+              </button>
+            )}
           </div>
         </div>
       </section>
