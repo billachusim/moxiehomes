@@ -25,7 +25,7 @@ function AuthPage() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/_authenticated/admin" });
+      if (data.session) navigate({ to: "/admin" });
     });
   }, [navigate]);
 
@@ -51,7 +51,7 @@ function AuthPage() {
       if (error) toast.error(error.message);
       else {
         toast.success("Welcome back!");
-        navigate({ to: "/_authenticated/admin" });
+        navigate({ to: "/admin" });
       }
     }
     setLoading(false);
@@ -62,7 +62,7 @@ function AuthPage() {
       redirect_uri: window.location.origin,
     });
     if (result.error) toast.error(result.error.message ?? "Google sign-in failed");
-    if (!result.redirected && !result.error) navigate({ to: "/_authenticated/admin" });
+    if (!result.redirected && !result.error) navigate({ to: "/admin" });
   };
 
   return (
