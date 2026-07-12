@@ -1,53 +1,64 @@
 ## Scope
 
-Three connected pieces on top of the existing "Book a site inspection" form and admin dashboard. Booking statuses stay as-is: **pending / confirmed / completed / cancelled**.
+You asked for real work email addresses (`info@`, `admin@`, `ceo@`, `inspections@moxiehomesandproperties.com`). Since Lovable doesn't host inboxes, this plan sets up **Zoho Mail free tier** (real mailboxes you can sign into) **and** Lovable Emails on a separate subdomain (so automated inspection emails still send from your brand without conflicting with your inboxes).
+
+Why Zoho: free for up to 5 mailboxes on your own domain, which fits your four addresses perfectly. Google Workspace would cost ~$28/month for the same.
 
 ---
 
-### 1. On-screen confirmation after submitting
+### 1. Mailboxes at Zoho Mail (free, up to 5 users)
 
-- After a successful submit on the listing detail page, navigate to a new route `/inspection-confirmed` (query params: `listing`, `date`, `time`).
-- The page shows a large success card: check icon, "Your inspection is booked", a summary of what they submitted (property, date, preferred time, contact email), what to expect next ("our team will call you within 24 hours to confirm"), and CTAs back to the listing and to browse more properties.
-- The inline booking form on the listing page keeps a small inline success state as a fallback for users who dismiss the redirect.
+**What you do at Zoho** (I can't do these from Lovable — they need your login):
+1. Sign up at [zoho.com/mail](https://www.zoho.com/mail/zohomail-pricing.html) → pick the **Forever Free Plan** (5 users, 5GB each).
+2. Add domain: `moxiehomesandproperties.com`.
+3. Zoho gives you 3 DNS records to add at your registrar:
+   - 1 TXT (domain verification)
+   - 2 MX records (`mx.zoho.com` priority 10, `mx2.zoho.com` priority 20)
+   - Optional SPF + DKIM for deliverability (recommended)
+4. Create the four mailboxes: `info`, `admin`, `ceo`, `inspections`.
+5. Log into each at [mail.zoho.com](https://mail.zoho.com).
 
-### 2. Email notifications (Lovable Emails)
+**Where to add DNS**: depends on where you bought the domain. If it's through Lovable, I'll show you how; if elsewhere (Namecheap, GoDaddy, Cloudflare, etc.), you'll do it in that provider's DNS panel.
 
-Prerequisite: Lovable Emails needs a verified sender domain. Since one isn't set up yet, the plan will:
+### 2. Lovable Emails on a separate subdomain
 
-1. Prompt the email-domain setup dialog first (one-click; you complete DNS with the registrar afterwards).
-2. Once the domain is registered in the project (even before DNS fully verifies), scaffold email infrastructure + transactional templates.
-3. Two branded templates:
-   - **Client confirmation** — "We've received your inspection request for {property}" with date/time and contact info.
-   - **Admin alert** — sent to `onwanku@gmail.com` and `victoriajeremiah@gmail.com` with all booking details and a link into the admin dashboard.
-4. A trigger: when a row is inserted into `inspection_bookings`, a server function enqueues both emails using the booking's id as the idempotency key (so retries don't duplicate).
+Lovable delegates a whole subdomain via NS records, which conflicts with putting MX records on the same name. Standard fix: use a **sending subdomain**.
 
-Emails start sending automatically once your domain's DNS is verified — no code changes needed after that. Until then, the form + confirmation page + admin dashboard still work; emails just queue.
+- Sender subdomain: `notify.moxiehomesandproperties.com`
+- Visible From address: `inspections@moxiehomesandproperties.com` (Lovable supports displaying the root domain while sending via the delegated subdomain)
+- I'll trigger the Lovable email setup dialog — you complete a one-click DNS step, and Lovable manages SPF/DKIM inside that subdomain automatically.
+- Once verified, the automated booking-confirmation + admin-alert emails from the previous turn's plan start sending.
 
-No SMS, per your choice.
+### 3. Forward mailbox replies correctly
 
-### 3. Admin actions on bookings
+When a client replies to a Lovable-sent inspection confirmation, the reply should land in the real `inspections@` Zoho inbox. I'll configure the email templates so the `Reply-To` header is `inspections@moxiehomesandproperties.com` — the mailbox you'll be reading in Zoho.
 
-Enhance the "Inspections" tab in the admin dashboard (currently a read-only table with a status dropdown):
+### 4. Update the app to use the new addresses
 
-- **Row → detail drawer** with everything the client submitted (name, email, phone, property + link, preferred date/time, client notes, created date).
-- **Status dropdown** stays inline in the row and in the drawer — same four values as today (pending / confirmed / completed / cancelled), color-coded badges.
-- **Admin notes**: textarea in the drawer, "Save notes" button, writes to the existing `admin_notes` column. Shows last-updated timestamp.
-- **Quick filters** above the table: All / Pending / Confirmed / Completed / Cancelled, plus a search box (name/email/phone).
-- **Quick actions** in the drawer: "Copy phone", "Copy email", "Open in mail client" (mailto).
+- `src/lib/site.ts`: swap the placeholder contact email(s) to `info@moxiehomesandproperties.com`.
+- Contact page / footer: display all four addresses with what each is for:
+  - `info@` — general inquiries
+  - `inspections@` — site inspection bookings
+  - `admin@` — operations
+  - `ceo@` — leadership
+- Auto-grant admin trigger already covers `onwanku@` and `victoriajeremiah@` (personal). If you want anyone signing up with `@moxiehomesandproperties.com` to auto-get an admin role too, say so and I'll add a domain-based trigger (only after email verification, to prevent spoofing).
 
 ---
 
-## Technical notes
+## Order of operations
 
-- New route file: `src/routes/inspection-confirmed.tsx` (public, no auth gate).
-- Update `InspectionForm` in `src/routes/listings.$slug.tsx` to `navigate({ to: "/inspection-confirmed", search: {...} })` on success.
-- New server function `src/lib/bookings.functions.ts` → `notifyBookingCreated({ bookingId })`; enqueues two `sendTransactionalEmail` calls. Called from the client right after the insert succeeds (public — no auth required, but validates that the booking id exists and hasn't already been notified via idempotency key).
-- Templates land under `src/lib/email-templates/booking-client-confirmation.tsx` and `booking-admin-alert.tsx`; both registered in `registry.ts`.
-- Admin dashboard changes are scoped to `BookingsAdmin` in `src/routes/_authenticated/admin.tsx`: new drawer component, filter/search state, notes mutation via `supabase.from("inspection_bookings").update(...)`.
-- No schema changes required — `admin_notes` and `status` already exist.
+1. **You**: create the Zoho account, add the domain, get the DNS records.
+2. **You**: add Zoho's MX/TXT records at your DNS provider.
+3. **Me**: trigger the Lovable email-domain setup dialog for `notify.moxiehomesandproperties.com`.
+4. **You**: complete the one-click Lovable DNS step.
+5. **Me**: scaffold Lovable email templates + inspection notification triggers (from the previous plan), set `Reply-To: inspections@…`, update the app to display the new addresses.
+6. Wait for DNS propagation (usually under an hour, up to 72h max).
 
-## What happens on your end
+## What I can't do
 
-1. When I set up email domain, you'll see a dialog to pick your sender subdomain (e.g. `notify.moxiehomes.com`) and get DNS records to paste at your registrar.
-2. After DNS verifies (usually minutes to a few hours), queued emails start sending automatically.
-3. Everything else (confirmation page, admin drawer, notes, filters) works immediately.
+- Sign into Zoho for you or create their account.
+- Add DNS records at your registrar automatically (unless the domain is bought through Lovable — say so and I'll walk you through the in-app DNS manager).
+
+## Open question you can answer any time
+
+Where is `moxiehomesandproperties.com` registered (Lovable, Namecheap, GoDaddy, Cloudflare, other)? That determines whether you add DNS in Lovable's UI or at the registrar.
