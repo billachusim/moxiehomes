@@ -42,7 +42,7 @@ function TeamPage() {
               <div key={m.id} className="rounded-xl border border-border p-6 text-center">
                 <div className="mx-auto flex h-32 w-32 items-center justify-center overflow-hidden rounded-full bg-cream">
                   {m.photo_url ? (
-                    <img src={m.photo_url} alt={m.full_name} className="h-full w-full object-cover" />
+                    <img src={m.photo_url} alt={m.full_name ?? ""} className="h-full w-full object-cover" />
                   ) : (
                     <User className="h-14 w-14 text-gold" />
                   )}
