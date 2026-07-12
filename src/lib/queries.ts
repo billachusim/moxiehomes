@@ -38,9 +38,8 @@ export const teamQuery = queryOptions({
   queryKey: ["team"],
   queryFn: async () => {
     const { data, error } = await supabase
-      .from("team_members")
+      .from("team_members_public")
       .select("*")
-      .eq("active", true)
       .order("sort_order");
     if (error) throw error;
     return data ?? [];
