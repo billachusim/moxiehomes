@@ -559,19 +559,75 @@ function InquiriesAdmin() {
 }
 
 // ============ BOOKINGS ============
+type BookingStatus = "pending" | "confirmed" | "completed" | "cancelled";
+const BOOKING_STATUSES: BookingStatus[] = ["pending", "confirmed", "completed", "cancelled"];
+const STATUS_STYLES: Record<BookingStatus, string> = {
+  pending: "bg-amber-100 text-amber-900",
+  confirmed: "bg-blue-100 text-blue-900",
+  completed: "bg-green-100 text-green-900",
+  cancelled: "bg-red-100 text-red-900",
+};
+
 function BookingsAdmin() {
   const qc = useQueryClient();
   const { data = [], isLoading } = useQuery({
     queryKey: ["admin", "bookings"],
-    queryFn: async () => (await supabase.from("inspection_bookings").select("*, listings(title,slug)").order("preferred_date", { ascending: true })).data ?? [],
+    queryFn: async () => (await supabase.from("inspection_bookings").select("*, listings(title,slug)").order("created_at", { ascending: false })).data ?? [],
   });
-  const setStatus = async (id: string, status: string) => {
-    await supabase.from("inspection_bookings").update({ status: status as any }).eq("id", id);
+  const [filter, setFilter] = useState<BookingStatus | "all">("all");
+  const [search, setSearch] = useState("");
+  const [openId, setOpenId] = useState<string | null>(null);
+
+  const setStatus = async (id: string, status: BookingStatus) => {
+    const { error } = await supabase.from("inspection_bookings").update({ status: status as any }).eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("Status updated");
     qc.invalidateQueries({ queryKey: ["admin", "bookings"] });
   };
+
+  const filtered = (data as any[]).filter((b) => {
+    if (filter !== "all" && b.status !== filter) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      return (
+        (b.name ?? "").toLowerCase().includes(q) ||
+        (b.email ?? "").toLowerCase().includes(q) ||
+        (b.phone ?? "").toLowerCase().includes(q) ||
+        (b.listings?.title ?? "").toLowerCase().includes(q)
+      );
+    }
+    return true;
+  });
+
+  const openBooking = (data as any[]).find((b) => b.id === openId) ?? null;
+
+  const counts: Record<string, number> = { all: (data as any[]).length };
+  for (const s of BOOKING_STATUSES) counts[s] = (data as any[]).filter((b) => b.status === s).length;
+
   return (
     <div>
       <SectionHeader title="Site inspections" subtitle="Inspection bookings from listing pages." />
+
+      <div className="mb-4 flex flex-wrap items-center gap-2">
+        {(["all", ...BOOKING_STATUSES] as const).map((s) => (
+          <button
+            key={s}
+            onClick={() => setFilter(s)}
+            className={`rounded-full px-3 py-1.5 text-xs capitalize transition-colors ${
+              filter === s ? "bg-navy text-navy-foreground" : "bg-secondary text-navy hover:bg-secondary/80"
+            }`}
+          >
+            {s} <span className="opacity-60">({counts[s] ?? 0})</span>
+          </button>
+        ))}
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search name, email, phone, property…"
+          className="ml-auto h-9 w-full max-w-xs rounded-md border border-input bg-background px-3 text-sm"
+        />
+      </div>
+
       {isLoading ? <Loading /> : (
         <div className="overflow-hidden rounded-xl border bg-background">
           <table className="w-full text-sm">
@@ -582,23 +638,32 @@ function BookingsAdmin() {
                 <th className="p-3 text-left">Date</th>
                 <th className="p-3 text-left">Contact</th>
                 <th className="p-3 text-left">Status</th>
+                <th className="p-3 text-left">Notes</th>
+                <th className="p-3"></th>
               </tr>
             </thead>
             <tbody>
-              {data.length === 0 && <tr><td colSpan={5} className="p-6 text-center text-muted-foreground">No bookings yet.</td></tr>}
-              {data.map((b: any) => (
-                <tr key={b.id} className="border-t">
-                  <td className="p-3">{b.name}</td>
-                  <td className="p-3">{b.listings?.title ?? "—"}</td>
-                  <td className="p-3">{b.preferred_date}</td>
+              {filtered.length === 0 && <tr><td colSpan={7} className="p-6 text-center text-muted-foreground">No bookings match.</td></tr>}
+              {filtered.map((b: any) => (
+                <tr key={b.id} className="border-t hover:bg-muted/40">
+                  <td className="p-3 font-medium">{b.name}</td>
+                  <td className="p-3 text-muted-foreground">{b.listings?.title ?? "—"}</td>
+                  <td className="p-3">{b.preferred_date}{b.preferred_time ? ` · ${b.preferred_time}` : ""}</td>
                   <td className="p-3 text-muted-foreground">{b.phone}<br/><span className="text-xs">{b.email}</span></td>
                   <td className="p-3">
-                    <select value={b.status} onChange={(e) => setStatus(b.id, e.target.value as any)} className="h-9 rounded-md border px-2 text-xs">
-                      <option value="pending">Pending</option>
-                      <option value="confirmed">Confirmed</option>
-                      <option value="completed">Completed</option>
-                      <option value="cancelled">Cancelled</option>
+                    <select
+                      value={b.status}
+                      onChange={(e) => setStatus(b.id, e.target.value as BookingStatus)}
+                      className={`h-8 rounded-md border-0 px-2 text-xs font-medium capitalize ${STATUS_STYLES[b.status as BookingStatus] ?? "bg-secondary"}`}
+                    >
+                      {BOOKING_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
                     </select>
+                  </td>
+                  <td className="p-3 text-xs text-muted-foreground max-w-[180px] truncate">{b.admin_notes || <span className="italic">—</span>}</td>
+                  <td className="p-3 text-right">
+                    <button onClick={() => setOpenId(b.id)} className="text-navy hover:text-gold text-xs font-medium">
+                      Open
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -606,9 +671,116 @@ function BookingsAdmin() {
           </table>
         </div>
       )}
+
+      {openBooking && (
+        <BookingDrawer
+          booking={openBooking}
+          onClose={() => setOpenId(null)}
+          onSaved={() => qc.invalidateQueries({ queryKey: ["admin", "bookings"] })}
+        />
+      )}
     </div>
   );
 }
+
+function BookingDrawer({ booking, onClose, onSaved }: { booking: any; onClose: () => void; onSaved: () => void }) {
+  const [notes, setNotes] = useState<string>(booking.admin_notes ?? "");
+  const [status, setStatusLocal] = useState<BookingStatus>(booking.status);
+  const [saving, setSaving] = useState(false);
+
+  const save = async () => {
+    setSaving(true);
+    const { error } = await supabase
+      .from("inspection_bookings")
+      .update({ admin_notes: notes, status: status as any })
+      .eq("id", booking.id);
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success("Booking updated");
+    onSaved();
+    onClose();
+  };
+
+  const copy = (v: string) => {
+    navigator.clipboard.writeText(v);
+    toast.success("Copied");
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/40" />
+      <div className="relative h-full w-full max-w-lg overflow-y-auto bg-background p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between">
+          <h3 className="font-serif text-2xl text-navy">Booking detail</h3>
+          <button onClick={onClose} className="text-muted-foreground hover:text-navy">✕</button>
+        </div>
+
+        <div className="mt-6 grid gap-4 rounded-lg border border-border bg-cream p-4 text-sm">
+          <Field label="Client" value={booking.name} />
+          <Field label="Email" value={booking.email} action={<button onClick={() => copy(booking.email)} className="text-xs text-gold hover:underline">Copy</button>} link={`mailto:${booking.email}`} />
+          <Field label="Phone" value={booking.phone} action={<button onClick={() => copy(booking.phone)} className="text-xs text-gold hover:underline">Copy</button>} link={`tel:${booking.phone}`} />
+          <Field label="Property" value={booking.listings?.title ?? "—"} link={booking.listings?.slug ? `/listings/${booking.listings.slug}` : undefined} />
+          <Field label="Preferred date" value={`${booking.preferred_date}${booking.preferred_time ? " · " + booking.preferred_time : ""}`} />
+          <Field label="Submitted" value={new Date(booking.created_at).toLocaleString()} />
+          {booking.notes && (
+            <div>
+              <div className="text-[0.65rem] uppercase tracking-widest text-muted-foreground">Client notes</div>
+              <div className="mt-1 whitespace-pre-line text-navy">{booking.notes}</div>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-6">
+          <label className="text-xs uppercase tracking-widest text-muted-foreground">Status</label>
+          <select
+            value={status}
+            onChange={(e) => setStatusLocal(e.target.value as BookingStatus)}
+            className="mt-2 h-10 w-full rounded-md border border-input bg-background px-3 text-sm capitalize"
+          >
+            {BOOKING_STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
+        </div>
+
+        <div className="mt-4">
+          <label className="text-xs uppercase tracking-widest text-muted-foreground">Admin notes (internal)</label>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="Called client, scheduled for Saturday 10am…"
+            className="mt-2 min-h-32 w-full rounded-md border border-input bg-background p-3 text-sm outline-none focus:border-gold"
+          />
+          {booking.updated_at && (
+            <div className="mt-1 text-xs text-muted-foreground">Last updated {new Date(booking.updated_at).toLocaleString()}</div>
+          )}
+        </div>
+
+        <div className="mt-6 flex justify-end gap-2">
+          <button onClick={onClose} className="rounded-md border px-4 py-2 text-sm">Close</button>
+          <button onClick={save} disabled={saving} className="rounded-md bg-navy px-4 py-2 text-sm text-navy-foreground disabled:opacity-60">
+            {saving ? "Saving..." : "Save changes"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Field({ label, value, action, link }: { label: string; value: string; action?: React.ReactNode; link?: string }) {
+  return (
+    <div className="flex items-start justify-between gap-3">
+      <div className="min-w-0">
+        <div className="text-[0.65rem] uppercase tracking-widest text-muted-foreground">{label}</div>
+        {link ? (
+          <a href={link} className="mt-0.5 block text-navy hover:text-gold truncate">{value}</a>
+        ) : (
+          <div className="mt-0.5 text-navy truncate">{value}</div>
+        )}
+      </div>
+      {action}
+    </div>
+  );
+}
+
 
 // ============ USERS ============
 function UsersAdmin() {

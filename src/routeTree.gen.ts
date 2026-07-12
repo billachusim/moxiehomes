@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TeamRouteImport } from './routes/team'
+import { Route as InspectionConfirmedRouteImport } from './routes/inspection-confirmed'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
@@ -24,6 +25,11 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 const TeamRoute = TeamRouteImport.update({
   id: '/team',
   path: '/team',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InspectionConfirmedRoute = InspectionConfirmedRouteImport.update({
+  id: '/inspection-confirmed',
+  path: '/inspection-confirmed',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/inspection-confirmed': typeof InspectionConfirmedRoute
   '/team': typeof TeamRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -93,6 +100,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/inspection-confirmed': typeof InspectionConfirmedRoute
   '/team': typeof TeamRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -107,6 +115,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/auth': typeof AuthRoute
   '/contact': typeof ContactRoute
+  '/inspection-confirmed': typeof InspectionConfirmedRoute
   '/team': typeof TeamRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/contact'
+    | '/inspection-confirmed'
     | '/team'
     | '/admin'
     | '/blog/$slug'
@@ -133,6 +143,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/contact'
+    | '/inspection-confirmed'
     | '/team'
     | '/admin'
     | '/blog/$slug'
@@ -146,6 +157,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/auth'
     | '/contact'
+    | '/inspection-confirmed'
     | '/team'
     | '/_authenticated/admin'
     | '/blog/$slug'
@@ -160,6 +172,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AuthRoute: typeof AuthRoute
   ContactRoute: typeof ContactRoute
+  InspectionConfirmedRoute: typeof InspectionConfirmedRoute
   TeamRoute: typeof TeamRoute
   BlogSlugRoute: typeof BlogSlugRoute
   ListingsSlugRoute: typeof ListingsSlugRoute
@@ -174,6 +187,13 @@ declare module '@tanstack/react-router' {
       path: '/team'
       fullPath: '/team'
       preLoaderRoute: typeof TeamRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inspection-confirmed': {
+      id: '/inspection-confirmed'
+      path: '/inspection-confirmed'
+      fullPath: '/inspection-confirmed'
+      preLoaderRoute: typeof InspectionConfirmedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -266,6 +286,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AuthRoute: AuthRoute,
   ContactRoute: ContactRoute,
+  InspectionConfirmedRoute: InspectionConfirmedRoute,
   TeamRoute: TeamRoute,
   BlogSlugRoute: BlogSlugRoute,
   ListingsSlugRoute: ListingsSlugRoute,

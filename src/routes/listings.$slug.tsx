@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { MapPin, Play } from "lucide-react";
@@ -7,6 +7,7 @@ import { SiteLayout } from "@/components/site-layout";
 import { listingBySlugQuery } from "@/lib/queries";
 import { supabase } from "@/integrations/supabase/client";
 import { youtubeEmbedUrl } from "@/lib/site";
+
 
 export const Route = createFileRoute("/listings/$slug")({
   loader: async ({ context, params }) => {
@@ -113,14 +114,16 @@ function ListingDetail() {
         </div>
 
         <aside className="lg:sticky lg:top-28 h-fit">
-          <InspectionForm listingId={l.id} listingTitle={l.title} />
+          <InspectionForm listingId={l.id} listingTitle={l.title} listingSlug={l.slug} />
         </aside>
+
       </section>
     </SiteLayout>
   );
 }
 
-function InspectionForm({ listingId, listingTitle }: { listingId: string; listingTitle: string }) {
+function InspectionForm({ listingId, listingTitle, listingSlug }: { listingId: string; listingTitle: string; listingSlug: string }) {
+  const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", preferred_date: "", notes: "" });
 
@@ -140,11 +143,20 @@ function InspectionForm({ listingId, listingTitle }: { listingId: string; listin
       notes: form.notes || `Interested in ${listingTitle}`,
     });
     setSubmitting(false);
-    if (error) toast.error(error.message);
-    else {
-      toast.success("Inspection request sent! We'll be in touch shortly.");
-      setForm({ name: "", email: "", phone: "", preferred_date: "", notes: "" });
+    if (error) {
+      toast.error(error.message);
+      return;
     }
+    toast.success("Inspection request sent!");
+    navigate({
+      to: "/inspection-confirmed",
+      search: {
+        listing: listingTitle,
+        slug: listingSlug,
+        date: form.preferred_date,
+        email: form.email,
+      },
+    });
   };
 
   return (
@@ -164,3 +176,4 @@ function InspectionForm({ listingId, listingTitle }: { listingId: string; listin
     </form>
   );
 }
+
