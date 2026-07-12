@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Instagram, Facebook, Phone } from "lucide-react";
-import logo from "@/assets/moxie-logo.png.asset.json";
+import logo from "@/assets/moxie-logo-real.jpg.asset.json";
 import { SITE } from "@/lib/site";
 
 export function SiteFooter() {
@@ -9,7 +9,7 @@ export function SiteFooter() {
       <div className="container-page grid gap-10 py-16 md:grid-cols-4">
         <div className="md:col-span-2">
           <div className="flex items-center gap-3">
-            <img src={logo.url} alt="" className="h-12 w-auto invert brightness-0" style={{ filter: "brightness(0) invert(1) sepia(1) saturate(6) hue-rotate(0deg)" }} />
+            <img src={logo.url} alt="" className="h-14 w-auto rounded" />
             <div>
               <div className="font-serif text-xl">Moxie Homes & Properties</div>
               <div className="text-[0.65rem] uppercase tracking-[0.25em] text-gold">
@@ -63,7 +63,7 @@ export function SiteFooter() {
       <div className="border-t border-white/10">
         <div className="container-page flex flex-col md:flex-row items-center justify-between gap-3 py-5 text-xs text-white/50">
           <div>© {new Date().getFullYear()} {SITE.fullName}. All rights reserved.</div>
-          <div>Abuja · Nigeria</div>
+          <div className="md:text-right md:max-w-md">{SITE.address}</div>
         </div>
       </div>
     </footer>

@@ -4,6 +4,7 @@ export const SITE = {
   tagline: "Utmost trust and credibility in real estate investment.",
   phone: "0814 390 0780",
   phoneHref: "tel:+2348143900780",
+  address: "Suite E1, Victory Plaza, 7 Onitsha Crescent, Off Gimbiya Street, Area 11, Garki, Abuja.",
   socials: {
     instagram: "https://instagram.com/moxiehomesandpropertiesltd_",
     facebook: "https://www.facebook.com/share/19dpYR6mvU/?mibextid=wwXIfr",
