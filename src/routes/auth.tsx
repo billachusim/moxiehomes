@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
-import logo from "@/assets/moxie-logo.png.asset.json";
+import logo from "@/assets/moxie-logo-real.jpg.asset.json";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
