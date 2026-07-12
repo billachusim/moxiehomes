@@ -62,7 +62,7 @@ function AuthPage() {
       if (error) toast.error(error.message);
       else {
         toast.success("Welcome back!");
-        navigate({ to: "/admin" });
+        await redirectAfterAuth();
       }
     }
     setLoading(false);
@@ -73,7 +73,7 @@ function AuthPage() {
       redirect_uri: window.location.origin,
     });
     if (result.error) toast.error(result.error.message ?? "Google sign-in failed");
-    if (!result.redirected && !result.error) navigate({ to: "/admin" });
+    if (!result.redirected && !result.error) await redirectAfterAuth();
   };
 
   return (
