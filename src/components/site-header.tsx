@@ -72,12 +72,22 @@ export function SiteHeader() {
 
         <div className="hidden lg:flex items-center gap-3">
           {signedIn ? (
-            <Link
-              to="/admin"
-              className="text-sm font-medium text-navy hover:text-gold transition-colors"
-            >
-              Dashboard
-            </Link>
+            <>
+              {isAdmin && (
+                <Link
+                  to="/admin"
+                  className="text-sm font-medium text-navy hover:text-gold transition-colors"
+                >
+                  Admin
+                </Link>
+              )}
+              <button
+                onClick={signOut}
+                className="text-sm font-medium text-navy hover:text-gold transition-colors"
+              >
+                Sign out
+              </button>
+            </>
           ) : (
             <Link
               to="/auth"
