@@ -2,7 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import logo from "@/assets/moxie-logo.png.asset.json";
+import logo from "@/assets/moxie-logo-real.jpg.asset.json";
 import { SITE } from "@/lib/site";
 
 const NAV = [
@@ -31,7 +31,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
       <div className="container-page flex h-20 items-center justify-between gap-6">
         <Link to="/" className="flex items-center gap-3">
-          <img src={logo.url} alt={SITE.name} className="h-10 w-auto" />
+          <img src={logo.url} alt={SITE.name} className="h-12 w-auto rounded" />
           <span className="hidden sm:flex flex-col leading-tight">
             <span className="font-serif text-lg text-navy">Moxie Homes</span>
             <span className="text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground">

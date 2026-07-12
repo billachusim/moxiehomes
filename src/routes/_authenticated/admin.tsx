@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Loader2, LogOut, Plus, Trash2, Edit, Star, Home, Users, MessageSquare, CalendarDays, FileText, Quote, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import logo from "@/assets/moxie-logo.png.asset.json";
+import logo from "@/assets/moxie-logo-real.jpg.asset.json";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Phone, Instagram, Facebook, Mail } from "lucide-react";
+import { Phone, Instagram, Facebook, Mail, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { SiteLayout } from "@/components/site-layout";
 import { supabase } from "@/integrations/supabase/client";
@@ -58,6 +58,13 @@ function ContactPage() {
             <a href={SITE.phoneHref} className="mt-2 flex items-center gap-2 font-serif text-2xl text-navy hover:text-gold">
               <Phone className="h-5 w-5" /> {SITE.phone}
             </a>
+          </div>
+          <div className="rounded-xl border border-border p-6">
+            <div className="text-xs uppercase tracking-[0.2em] text-gold">Visit us</div>
+            <div className="mt-2 flex items-start gap-2 text-navy">
+              <MapPin className="h-5 w-5 shrink-0 mt-0.5 text-gold" />
+              <span className="leading-relaxed">{SITE.address}</span>
+            </div>
           </div>
           <div className="rounded-xl border border-border p-6">
             <div className="text-xs uppercase tracking-[0.2em] text-gold">Follow us</div>
