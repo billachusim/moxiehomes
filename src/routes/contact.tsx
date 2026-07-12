@@ -60,6 +60,20 @@ function ContactPage() {
             </a>
           </div>
           <div className="rounded-xl border border-border p-6">
+            <div className="text-xs uppercase tracking-[0.2em] text-gold">Email us</div>
+            <ul className="mt-3 space-y-2 text-sm">
+              {SITE.emailContacts.map((e) => (
+                <li key={e.address} className="flex items-start gap-2">
+                  <Mail className="h-4 w-4 mt-1 text-gold shrink-0" />
+                  <div>
+                    <a href={`mailto:${e.address}`} className="text-navy hover:text-gold break-all">{e.address}</a>
+                    <div className="text-xs text-muted-foreground">{e.label}</div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="rounded-xl border border-border p-6">
             <div className="text-xs uppercase tracking-[0.2em] text-gold">Visit us</div>
             <div className="mt-2 flex items-start gap-2 text-navy">
               <MapPin className="h-5 w-5 shrink-0 mt-0.5 text-gold" />
