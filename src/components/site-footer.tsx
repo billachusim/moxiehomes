@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Instagram, Facebook, Phone } from "lucide-react";
+import { Instagram, Facebook, Phone, Mail } from "lucide-react";
 import logo from "@/assets/moxie-logo-real.jpg.asset.json";
 import { SITE } from "@/lib/site";
 
@@ -26,6 +26,16 @@ export function SiteFooter() {
           >
             <Phone className="h-4 w-4" /> {SITE.phone}
           </a>
+          <ul className="mt-4 space-y-1.5 text-sm text-white/70">
+            {SITE.emailContacts.map((e) => (
+              <li key={e.address} className="flex items-start gap-2">
+                <Mail className="h-3.5 w-3.5 mt-1 text-gold shrink-0" />
+                <a href={`mailto:${e.address}`} className="hover:text-gold break-all">
+                  {e.address} <span className="text-white/40">· {e.label}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
 
         <div>
