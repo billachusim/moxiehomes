@@ -9,14 +9,10 @@ export const SITE = {
   emails: {
     info: "info@moxiehomesandproperties.com",
     inspections: "inspections@moxiehomesandproperties.com",
-    admin: "admin@moxiehomesandproperties.com",
-    ceo: "ceo@moxiehomesandproperties.com",
   },
   emailContacts: [
     { label: "General inquiries", address: "info@moxiehomesandproperties.com" },
     { label: "Site inspections", address: "inspections@moxiehomesandproperties.com" },
-    { label: "Operations", address: "admin@moxiehomesandproperties.com" },
-    { label: "Leadership", address: "ceo@moxiehomesandproperties.com" },
   ],
   socials: {
     instagram: "https://instagram.com/moxiehomesandpropertiesltd_",
