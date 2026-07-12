@@ -24,10 +24,21 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/admin" });
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (data.session) navigate({ to: (await isAdmin(data.session.user.id)) ? "/admin" : "/" });
     });
   }, [navigate]);
+
+  async function isAdmin(userId: string) {
+    const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+    return (data ?? []).some((r) => r.role === "admin" || r.role === "editor");
+  }
+
+  async function redirectAfterAuth() {
+    const { data } = await supabase.auth.getUser();
+    if (!data.user) return navigate({ to: "/" });
+    navigate({ to: (await isAdmin(data.user.id)) ? "/admin" : "/" });
+  }
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
