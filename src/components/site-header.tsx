@@ -129,12 +129,22 @@ export function SiteHeader() {
             ))}
             <div className="mt-2 flex gap-2">
               {signedIn ? (
-                <Link
-                  to="/admin"
-                  className="flex-1 rounded-md border border-navy px-3 py-2 text-center text-sm font-medium text-navy"
-                >
-                  Dashboard
-                </Link>
+                <>
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      className="flex-1 rounded-md border border-navy px-3 py-2 text-center text-sm font-medium text-navy"
+                    >
+                      Admin
+                    </Link>
+                  )}
+                  <button
+                    onClick={signOut}
+                    className="flex-1 rounded-md border border-navy px-3 py-2 text-center text-sm font-medium text-navy"
+                  >
+                    Sign out
+                  </button>
+                </>
               ) : (
                 <Link
                   to="/auth"
