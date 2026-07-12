@@ -17,15 +17,31 @@ const NAV = [
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const [isAdmin, setIsAdmin] = useState(false);
+  const pathname = useRouterState((s) => s.location.pathname);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSignedIn(!!data.session));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSignedIn(!!s));
+    const load = async (userId: string | undefined) => {
+      if (!userId) return setIsAdmin(false);
+      const { data } = await supabase.from("user_roles").select("role").eq("user_id", userId);
+      setIsAdmin((data ?? []).some((r) => r.role === "admin" || r.role === "editor"));
+    };
+    supabase.auth.getSession().then(({ data }) => {
+      setSignedIn(!!data.session);
+      load(data.session?.user.id);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+      setSignedIn(!!s);
+      load(s?.user.id);
+    });
     return () => sub.subscription.unsubscribe();
   }, []);
 
   useEffect(() => setOpen(false), [pathname]);
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+  };
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur supports-[backdrop-filter]:bg-background/70">
