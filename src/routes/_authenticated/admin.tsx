@@ -249,7 +249,7 @@ function ListingForm({ initial, onClose, onSaved }: { initial: any; onClose: () 
         <Input label="City" value={f.city} onChange={(v) => setF({ ...f, city: v })} />
         <Input label="Price text" value={f.price_text} onChange={(v) => setF({ ...f, price_text: v })} />
         <Select label="Status" value={f.status} onChange={(v) => setF({ ...f, status: v })} options={["available", "reserved", "sold", "coming_soon"]} />
-        <Input label="Cover image URL" value={f.cover_image_url} onChange={(v) => setF({ ...f, cover_image_url: v })} className="md:col-span-2" />
+        <ImageUpload label="Cover image" folder="listings" value={f.cover_image_url} onChange={(v) => setF({ ...f, cover_image_url: v })} className="md:col-span-2" />
         <Input label="YouTube URL" value={f.youtube_url} onChange={(v) => setF({ ...f, youtube_url: v })} className="md:col-span-2" />
         <Textarea label="Description" value={f.description} onChange={(v) => setF({ ...f, description: v })} className="md:col-span-2" />
         <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={f.featured} onChange={(e) => setF({ ...f, featured: e.target.checked })} /> Featured</label>
