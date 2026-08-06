@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Loader2, LogOut, Plus, Trash2, Edit, Star, Home, Users, MessageSquare, CalendarDays, FileText, Quote, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/moxie-logo-real.jpg.asset.json";
+import { ImageUpload } from "@/components/admin/image-upload";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   component: AdminPage,
@@ -249,7 +250,7 @@ function ListingForm({ initial, onClose, onSaved }: { initial: any; onClose: () 
         <Input label="City" value={f.city} onChange={(v) => setF({ ...f, city: v })} />
         <Input label="Price text" value={f.price_text} onChange={(v) => setF({ ...f, price_text: v })} />
         <Select label="Status" value={f.status} onChange={(v) => setF({ ...f, status: v })} options={["available", "reserved", "sold", "coming_soon"]} />
-        <Input label="Cover image URL" value={f.cover_image_url} onChange={(v) => setF({ ...f, cover_image_url: v })} className="md:col-span-2" />
+        <ImageUpload label="Cover image" folder="listings" value={f.cover_image_url} onChange={(v) => setF({ ...f, cover_image_url: v })} className="md:col-span-2" />
         <Input label="YouTube URL" value={f.youtube_url} onChange={(v) => setF({ ...f, youtube_url: v })} className="md:col-span-2" />
         <Textarea label="Description" value={f.description} onChange={(v) => setF({ ...f, description: v })} className="md:col-span-2" />
         <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={f.featured} onChange={(e) => setF({ ...f, featured: e.target.checked })} /> Featured</label>
@@ -343,7 +344,7 @@ function TeamForm({ initial, onClose, onSaved }: { initial: any; onClose: () => 
       <form onSubmit={submit} className="grid gap-3 md:grid-cols-2">
         <Input label="Full name" value={f.full_name} onChange={(v) => setF({ ...f, full_name: v })} required />
         <Input label="Role" value={f.role} onChange={(v) => setF({ ...f, role: v })} required />
-        <Input label="Photo URL" value={f.photo_url} onChange={(v) => setF({ ...f, photo_url: v })} className="md:col-span-2" />
+        <ImageUpload label="Photo" folder="team" value={f.photo_url} onChange={(v: string) => setF({ ...f, photo_url: v })} className="md:col-span-2" />
         <Input label="Email" value={f.email} onChange={(v) => setF({ ...f, email: v })} />
         <Input label="Phone" value={f.phone} onChange={(v) => setF({ ...f, phone: v })} />
         <Textarea label="Bio" value={f.bio} onChange={(v) => setF({ ...f, bio: v })} className="md:col-span-2" />
@@ -430,7 +431,7 @@ function BlogForm({ initial, onClose, onSaved }: { initial: any; onClose: () => 
         <Input label="Title" value={f.title} onChange={(v) => setF({ ...f, title: v })} required />
         <Input label="Slug (auto)" value={f.slug} onChange={(v) => setF({ ...f, slug: v })} />
         <Input label="Author" value={f.author_name} onChange={(v) => setF({ ...f, author_name: v })} />
-        <Input label="Cover image URL" value={f.cover_image_url} onChange={(v) => setF({ ...f, cover_image_url: v })} />
+        <ImageUpload label="Cover image" folder="blog" value={f.cover_image_url} onChange={(v: string) => setF({ ...f, cover_image_url: v })} />
         <Textarea label="Excerpt" value={f.excerpt} onChange={(v) => setF({ ...f, excerpt: v })} />
         <Textarea label="Body" value={f.body} onChange={(v) => setF({ ...f, body: v })} className="min-h-64" />
         <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={f.published} onChange={(e) => setF({ ...f, published: e.target.checked })} /> Published</label>
