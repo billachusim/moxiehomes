@@ -84,10 +84,9 @@ Security has been built in from the ground up, not bolted on.
 
 ## 7. Admin Access Setup
 
-Two admin email addresses have been pre-approved for this project:
+The following admin email address has been pre-approved for this project:
 
 - **onwanku…@…** (CEO)
-- **victoria…@…** (Admin)  <!-- replace with Victoria's actual email -->
 
 **How to get in:**
 
