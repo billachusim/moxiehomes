@@ -1,19 +1,16 @@
-# Admin management in the Users section
+# Remove Victoria Jeremiah from the platform
 
-Scope it down: the Users tab becomes an **admin/editor management** screen, not a list of every app user.
+Assumption: "Jennifer" refers to Victoria Jeremiah — she is the only person on the platform matching, and there is no other person by that name in the accounts or team list. Tell me if you meant someone else.
 
 ## What changes
 
-- The Users tab lists only accounts that hold an admin or editor role — currently you and Victoria.
-- Any admin can see that list and promote/revoke admin or editor access (controls already exist, they just have nothing to show today).
-- Regular client accounts stay out of this screen entirely.
-- Each row shows the person's name, their email, and their roles, so you can tell people apart.
-
-Nothing changes for normal users: they still can only see their own profile.
+- Victoria's admin access is revoked, and her account is deleted from the platform entirely (she can no longer sign in).
+- Her email is removed from the auto-admin allow list, so creating a new account would not re-grant admin.
+- Her Team page entry ("Victoria Jeremiah — Admin/ICT") is removed, so she no longer appears publicly.
+- You (nachusim@gmail.com) remain the only admin. When you send me the next admin's email, I'll add it to the allow list.
 
 ## Technical notes
 
-- Migration:
-  - Add an `email` column to `public.profiles`, update `handle_new_user()` to store `NEW.email`, and backfill the two existing rows from `auth.users`.
-  - Add an admin-only SELECT policy on `profiles` restricted to rows whose user has an `admin` or `editor` role (via a security-definer helper), keeping `profiles_select_own` intact.
-- Frontend: in `UsersAdmin` (`src/routes/_authenticated/admin.tsx`), filter the list to users with roles, show email next to the name, and relabel the tab "Admins".
+- Update `grant_admin_for_allowlisted_email()` to drop `victoriajeremiah@gmail.com`, `victoriajeremiah0@gmail.com`, and `onwanku@gmail.com`? — only the two Victoria addresses are removed; `onwanku@gmail.com` stays unless you say otherwise.
+- Delete her rows: `user_roles`, `profiles`, `team_members` entry, then the `auth.users` record (cascades favorites/inquiries links).
+- Any inquiries or bookings she is linked to keep their data; the `user_id` reference nulls out or is detached rather than deleting customer records.
