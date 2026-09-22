@@ -433,29 +433,35 @@ export type Database = {
         Row: {
           active: boolean | null
           bio: string | null
+          created_at: string | null
           full_name: string | null
           id: string | null
           photo_url: string | null
           role: string | null
           sort_order: number | null
+          updated_at: string | null
         }
         Insert: {
           active?: boolean | null
           bio?: string | null
+          created_at?: string | null
           full_name?: string | null
           id?: string | null
           photo_url?: string | null
           role?: string | null
           sort_order?: number | null
+          updated_at?: string | null
         }
         Update: {
           active?: boolean | null
           bio?: string | null
+          created_at?: string | null
           full_name?: string | null
           id?: string | null
           photo_url?: string | null
           role?: string | null
           sort_order?: number | null
+          updated_at?: string | null
         }
         Relationships: []
       }
